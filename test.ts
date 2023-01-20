@@ -1,43 +1,55 @@
-import * as rsa from './index'
+import * as rsa from 'example-rsa'
+//Importar el modul RSA quan funcioni
+import * as perm from '.'
 import * as bcu from 'bigint-crypto-utils'
 
 async function test () {
+
     const keypair = await rsa.generateRsaKeys(1024)
     
-    const m = 1253n
-    console.log('m = ' + m)
-
-    const c = keypair.publicKey.encrypt(m)
-    console.log('c = ' + c)
-
-    const d = keypair.privateKey.decrypt(c)
-    console.log('d = ' + d)
-
-    if (d == m) {
-        console.log('OK')
-    } else {
-        console.log('ERROR')
-    }
-    
-    // Blind signature (using Bob keys) //
-    console.log('Blind signature')
-
-    // Alice
-    const m2 = 27n
     const r = bcu.randBetween(keypair.publicKey.n - 1n)
-    const blindedM = m2 * keypair.publicKey.encrypt(r) % keypair.publicKey.n
 
-    // Bob
-    const blindSignature = keypair.privateKey.sign(blindedM)
+    // Bob creates permision
 
-    //Alice
-    const signature = blindSignature * bcu.modInv(r,keypair.publicKey.n)
+    console.log('Permision Creation')
+    
+    const permision = await perm.createPermision("Bob", "file1");
 
-    if (keypair.publicKey.verify(signature) !== m2) {
-        console.log("NO")
+    console.log('...Permision created for user: ' + permision.user + ' and file: ' + permision.filename + ' with a ' + permision.status + ' status')
+
+    console.log('Permision Signing')
+
+    // Bob signs permision
+    console.log('...Creating signature content, encrypting it and signing it')
+
+    const signatureContent = BigInt(await perm.prepareSignature(permision))
+
+    const encryptedSignatureContent = signatureContent * keypair.publicKey.encrypt(r) % keypair.publicKey.n
+
+    const signedContent = keypair.privateKey.sign(encryptedSignatureContent)
+
+    //Alice checks signature
+    console.log('...Checking if the obtained signature is a match')
+
+    const obtainedSignature = signedContent * bcu.modInv(r,keypair.publicKey.n)
+
+    if (keypair.publicKey.verify(obtainedSignature) !== signatureContent) {
+        console.log("...NO")
     } else {
-        console.log("YES")
+        console.log("...YES")
     }
+
+    console.log('Permision Revocation')
+    // Bob revokes permison
+    console.log('...Revocating permision, checking permision status')
+
+    await perm.revokePermision(permision);
+    console.log('...' + permision.status)
+
+    console.log('...Unevocating permision, checking permision status')
+    await perm.unrevokePermision(permision);
+    console.log('...' + permision.status)
+
 }
 
 test()
