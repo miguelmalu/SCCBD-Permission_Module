@@ -1,6 +1,5 @@
 import * as rsa from 'example-rsa'
-//Importar el modul RSA quan funcioni
-import * as perm from '.'
+import * as perm from './index'
 import * as bcu from 'bigint-crypto-utils'
 
 async function test () {

@@ -1,5 +1,3 @@
-import * as bcu from 'bigint-crypto-utils'
-
 export class Permision {
     user: string
     filename: string

@@ -1,8 +1,30 @@
 {
-  "devDependencies": {
-    "ts-node": "^10.9.1"
+  "name": "permission-module",
+  "version": "0.1.0",
+  "description": "Permission Module",
+  "main": "./cjs/index.js",
+  "browser": "./esm/index.js",
+  "scripts": {
+    "test": "node test.js",
+    "build:esm": "npx rimraf ./esm/* && tsc -m ES2020 --outDir esm",
+    "build:cjs": "npx rimraf ./cjs/* && tsc -m commonjs --outDir cjs"
+  },
+  "author": "",
+  "license": "ISC",
+  "exports": {
+    ".": {
+      "node": {
+        "require": "./cjs/index.js",
+        "import": "./esm/index.js",
+        "module": "./esm/index.js"
+      },
+      "default": "./esm/index.js"
+    }
   },
   "dependencies": {
     "example-rsa": "file:../SCCBD-RSA_Module_Example"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1"
   }
 }
