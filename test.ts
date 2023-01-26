@@ -8,29 +8,31 @@ async function test () {
     
     const r = bcu.randBetween(keypair.publicKey.n - 1n)
 
-    // Bob creates permision
+    // Bob creates permission
 
-    console.log('Permision Creation')
+    console.log('Permission Creation')
     
-    const permision = await perm.createPermision("Bob", "file1");
+    const permission = await perm.createPermission("Bob", "file1");
 
-    console.log('...Permision created for user: ' + permision.user + ' and file: ' + permision.filename + ' with a ' + permision.status + ' status')
+    console.log('...Permission created for user: ' + permission.user + ' and file: ' + permission.filename + ' with a ' + permission.status + ' status')
 
-    console.log('Permision Signing')
+    console.log('Permission Signing')
 
-    // Bob signs permision
+    // Alice signs permission
     console.log('...Creating signature content, encrypting it and signing it')
 
-    const signatureContent = BigInt(await perm.prepareSignature(permision))
+    const signatureContent = BigInt(await perm.prepareSignature(permission))
 
     const encryptedSignatureContent = signatureContent * keypair.publicKey.encrypt(r) % keypair.publicKey.n
 
     const signedContent = keypair.privateKey.sign(encryptedSignatureContent)
+    const signedPermission = await perm.updatePermission(permission, "Alice", signedContent.toString(), r.toString())
 
-    //Alice checks signature
+
+    // Server checks signature
     console.log('...Checking if the obtained signature is a match')
 
-    const obtainedSignature = signedContent * bcu.modInv(r,keypair.publicKey.n)
+    const obtainedSignature = BigInt(signedPermission.signature!) * bcu.modInv(r,keypair.publicKey.n)
 
     if (keypair.publicKey.verify(obtainedSignature) !== signatureContent) {
         console.log("...NO")
@@ -38,16 +40,16 @@ async function test () {
         console.log("...YES")
     }
 
-    console.log('Permision Revocation')
+    console.log('Permission Revocation')
     // Bob revokes permison
-    console.log('...Revocating permision, checking permision status')
+    console.log('...Revocating permission, checking permission status')
 
-    await perm.revokePermision(permision);
-    console.log('...' + permision.status)
+    await perm.revokePermission(permission);
+    console.log('...' + permission.status)
 
-    console.log('...Unevocating permision, checking permision status')
-    await perm.unrevokePermision(permision);
-    console.log('...' + permision.status)
+    console.log('...Unevocating permission, checking permission status')
+    await perm.unrevokePermission(permission);
+    console.log('...' + permission.status)
 
 }
 

@@ -1,11 +1,15 @@
-export declare class Permision {
+export declare class Permission {
+    owner?: string;
     user: string;
     filename: string;
-    status: boolean;
-    constructor(user: string, filename: string, status: boolean);
+    status?: boolean;
+    signature?: string;
+    r?: string;
+    constructor(user: string, filename: string);
     checkStatus(status: boolean): boolean;
 }
-export declare function createPermision(user: string, filename: string): Promise<Permision>;
-export declare function revokePermision(permision: Permision): Promise<Permision>;
-export declare function unrevokePermision(permision: Permision): Promise<Permision>;
-export declare function prepareSignature(permision: Permision): Promise<string>;
+export declare function createPermission(user: string, filename: string): Promise<Permission>;
+export declare function updatePermission(permission: Permission, owner: string, signature: string, r: string): Promise<Permission>;
+export declare function revokePermission(permission: Permission): Promise<Permission>;
+export declare function unrevokePermission(permission: Permission): Promise<Permission>;
+export declare function prepareSignature(permission: Permission): Promise<string>;

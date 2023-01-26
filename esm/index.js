@@ -1,29 +1,34 @@
-export class Permision {
-    constructor(user, filename, status) {
+export class Permission {
+    constructor(user, filename) {
         this.user = user;
         this.filename = filename;
-        this.status = status;
     }
-    //Si no pots fer directament permision.status
+    //Si no pots fer directament permission.status
     checkStatus(status) {
         return status;
     }
 }
-export async function createPermision(user, filename) {
-    let status = true;
-    const permision = new Permision(user, filename, status);
-    return permision;
+export async function createPermission(user, filename) {
+    const permission = new Permission(user, filename);
+    return permission;
 }
-export async function revokePermision(permision) {
-    permision.status = false;
-    return permision;
+export async function updatePermission(permission, owner, signature, r) {
+    permission.owner = owner;
+    permission.status = true;
+    permission.signature = signature;
+    permission.r = r;
+    return permission;
 }
-export async function unrevokePermision(permision) {
-    permision.status = true;
-    return permision;
+export async function revokePermission(permission) {
+    permission.status = false;
+    return permission;
 }
-export async function prepareSignature(permision) {
-    let s = permision.user + '/' + permision.filename;
+export async function unrevokePermission(permission) {
+    permission.status = true;
+    return permission;
+}
+export async function prepareSignature(permission) {
+    let s = permission.user + '/' + permission.filename;
     let preparedSignature = '';
     for (let i = 0; i < s.length; i++) {
         let code = s.charCodeAt(i);

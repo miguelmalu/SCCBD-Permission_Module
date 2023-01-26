@@ -1,36 +1,42 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.prepareSignature = exports.unrevokePermision = exports.revokePermision = exports.createPermision = exports.Permision = void 0;
-class Permision {
-    constructor(user, filename, status) {
+exports.prepareSignature = exports.unrevokePermission = exports.revokePermission = exports.updatePermission = exports.createPermission = exports.Permission = void 0;
+class Permission {
+    constructor(user, filename) {
         this.user = user;
         this.filename = filename;
-        this.status = status;
     }
-    //Si no pots fer directament permision.status
+    //Si no pots fer directament permission.status
     checkStatus(status) {
         return status;
     }
 }
-exports.Permision = Permision;
-async function createPermision(user, filename) {
-    let status = true;
-    const permision = new Permision(user, filename, status);
-    return permision;
+exports.Permission = Permission;
+async function createPermission(user, filename) {
+    const permission = new Permission(user, filename);
+    return permission;
 }
-exports.createPermision = createPermision;
-async function revokePermision(permision) {
-    permision.status = false;
-    return permision;
+exports.createPermission = createPermission;
+async function updatePermission(permission, owner, signature, r) {
+    permission.owner = owner;
+    permission.status = true;
+    permission.signature = signature;
+    permission.r = r;
+    return permission;
 }
-exports.revokePermision = revokePermision;
-async function unrevokePermision(permision) {
-    permision.status = true;
-    return permision;
+exports.updatePermission = updatePermission;
+async function revokePermission(permission) {
+    permission.status = false;
+    return permission;
 }
-exports.unrevokePermision = unrevokePermision;
-async function prepareSignature(permision) {
-    let s = permision.user + '/' + permision.filename;
+exports.revokePermission = revokePermission;
+async function unrevokePermission(permission) {
+    permission.status = true;
+    return permission;
+}
+exports.unrevokePermission = unrevokePermission;
+async function prepareSignature(permission) {
+    let s = permission.user + '/' + permission.filename;
     let preparedSignature = '';
     for (let i = 0; i < s.length; i++) {
         let code = s.charCodeAt(i);
